@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel
 
 
@@ -8,8 +8,8 @@ class UserAuth(BaseModel):
 
 
 class UserPreferences(BaseModel):
-    eat_halal: bool = True
-    allergies: List[str] = []
-    ingredients: List[str] = []
-    price_max: int = 999999999
-    price_min: int = 0
+    eat_halal: Optional[bool] = None
+    allergies: Optional[List[str]] = None
+    ingredients: Optional[List[str]] = None
+    price_max: Optional[int] = None
+    price_min: Optional[int] = None

@@ -1,11 +1,10 @@
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from model.user_model import UserAuth, UserPreferences
-# from model.meal_model import MealPlan
+from model.meal_model import MealPlan
 from model.ml.ml_model import recommend_meals, all_meals, recipe_meal
 from service.config import auth
-from service.database_manager import *
-# import datetime
+from service.database_manager import read_users_collection, read_user_doc, create_user_doc, update_user_doc, read_meal_plan, read_meal_plan_doc, create_meal_plan
 from os import environ as env
 import re
 
@@ -71,7 +70,7 @@ async def register(userAuth: UserAuth):
             }
         user = auth.create_user_with_email_and_password(
             userAuth.email, userAuth.password)
-        add_user_doc(userAuth.email)
+        create_user_doc(userAuth.email)
         return {"message": "Registrasi berhasil!",
                 "userInfo": {
                     "email": user["email"],
@@ -168,13 +167,21 @@ async def get_meal_recipe(name: str, credentials: HTTPAuthorizationCredentials =
         }
 
 
-# @app.post("/user/mealplan")
-# async def post_meal_plan(mealPlan: MealPlan):
-#     # Convert the date string to datetime.date object
-#     mealPlan.date = datetime.strptime(mealPlan.date, "%Y-%m-%d").date()
+@app.get("/user/mealplan")
+async def get_meal_plan(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    token = credentials.credentials
+    user = auth.get_account_info(token)
+    email = user["users"][0]["email"]
+    mealPlan = read_meal_plan(email)
+    return {"data": mealPlan}
 
-#     # Save the meal plan data to Firestore
-#     # Example code:
-#     meal_plan_data = mealPlan.dict()
-#     db.collection('meal_plans').add(meal_plan_data)
-#     return {"message": "Meal plan created successfully"}
+
+@app.post("/user/mealplan")
+async def post_meal_plan(mealPlan: MealPlan, credentials: HTTPAuthorizationCredentials = Depends(security)):
+    token = credentials.credentials
+    user = auth.get_account_info(token)
+    email = user["users"][0]["email"]
+    create_meal_plan(email, mealPlan.date,
+                     mealPlan.meal_name, mealPlan.group_meal)
+    meal_plan = read_meal_plan_doc(email, mealPlan.date)
+    return {"data": meal_plan}
