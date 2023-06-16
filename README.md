@@ -35,3 +35,5 @@ To replicate the Kostkater ML Model API, follow the steps below:
     This command will create and start the necessary Docker containers for the Kostkater ML Model API.
     
 5. **Update the Files**: Once the Docker containers are running, you can make changes to the project files. The application will automatically reload whenever a file is updated.
+6. **Acess the API**:After the contaiers have started successfully, you can access the Kostkater ML Model API at the followwing URL:https://koskkater-api-bs2yfqpjra-et.a.run.app/
+Use this API URL to interact with the Kostkater ML Model and utilize its varios services
